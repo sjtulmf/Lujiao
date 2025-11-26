@@ -682,6 +682,11 @@ if(CONFIG_IDF_TARGET_ESP32)
                              )
 endif()
 
+if(CONFIG_IDF_TARGET_ESP32S3)
+    list(REMOVE_ITEM SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/boards/common/esp32_camera.cc"
+                             )
+endif()
+
 idf_component_register(SRCS ${SOURCES}
                     EMBED_FILES ${LANG_SOUNDS} ${COMMON_SOUNDS}
                     INCLUDE_DIRS ${INCLUDE_DIRS}

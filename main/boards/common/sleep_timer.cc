@@ -12,7 +12,7 @@
 
 
 SleepTimer::SleepTimer(int seconds_to_light_sleep, int seconds_to_deep_sleep)
-    : seconds_to_light_sleep_(seconds_to_light_sleep), seconds_to_deep_sleep_(seconds_to_deep_sleep) {
+    : seconds_to_light_sleep_(seconds_to_light_sleep > 0 ? 6*seconds_to_light_sleep : seconds_to_light_sleep), seconds_to_deep_sleep_(seconds_to_deep_sleep > 0 ? 6*seconds_to_deep_sleep : seconds_to_deep_sleep) {
     esp_timer_create_args_t timer_args = {
         .callback = [](void* arg) {
             auto self = static_cast<SleepTimer*>(arg);

@@ -19,6 +19,11 @@
 
 #define TAG "Application"
 
+// variables for air-con controlling
+int temp = 0;
+std::string fan_level = "medium";
+std::string acmode = "AC_off";
+bool bulbmode = false;
 
 static const char* const STATE_STRINGS[] = {
     "unknown",
@@ -67,6 +72,263 @@ Application::~Application() {
         esp_timer_delete(clock_timer_handle_);
     }
     vEventGroupDelete(event_group_);
+}
+
+std::string SendACStatus(int temperature, std::string fan_level, std::string ac_mode) {
+
+    auto network = Board::GetInstance().GetNetwork();
+    auto http = network->CreateHttp(2);
+
+    // We use a specific entity ID for the AC. 
+    // You can use 'sensor.my_ac_status' or 'climate.my_custom_ac'
+    const std::string url = "http://123.60.38.166:8123/api/states/sensor.living_room_ac_status";
+
+    // 1. Set headers
+    http->SetHeader("Content-Type", "application/json; charset=utf-8"); 
+    http->SetHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhNzA4MzU1MWIxZGM0ODUzYmNmYjhiM2U3Y2NhMjM1OSIsImlhdCI6MTc2MzYyNzg2OCwiZXhwIjoyMDc4OTg3ODY4fQ.DOE7UIE6MBDNDPLVMUYx0nR8R0eVtDfbeMWRl_OoAyM");
+
+    // 2. Validate Temperature (18 - 30)
+    if (temperature < 18) temperature = 18;
+    if (temperature > 30) temperature = 30;
+
+    // 3. Construct the JSON Body
+    // We map the arguments to the JSON structure.
+    // Structure:
+    // {
+    //   "state": "cool", 
+    //   "attributes": {
+    //     "temperature": 24,
+    //     "fan_mode": "medium",
+    //     "unit_of_measurement": "°C"
+    //   }
+    // }
+    
+    std::string json_payload = "{"
+        "\"state\": \"" + ac_mode + "\","
+        "\"attributes\": {"
+            "\"temperature\": " + std::to_string(temperature) + ","
+            "\"fan_mode\": \"" + fan_level + "\","
+            "\"friendly_name\": \"Living Room AC Control\","
+            "\"icon\": \"mdi:air-conditioner\""
+        "}"
+    "}";
+
+    // 3. Open the connection
+    if (!http->Open("POST", url)) {
+        return "{\"success\": false, \"message\": \"Failed to connect to URL\"}";
+    }
+
+    // 4. Write the POST body
+    int bytes_written = http->Write(json_payload.c_str(), json_payload.size());
+    http->Write("", 0); 
+
+    if (bytes_written != json_payload.size()) {
+        http->Close();
+        return "{\"success\": false, \"message\": \"Failed to write POST body\"}";
+    }
+
+    // 5. Check the response status
+    int status_code = http->GetStatusCode();
+    
+    if (status_code != 200 && status_code != 201) { 
+        http->Close();
+        return "{\"success\": false, \"message\": \"Request failed with status " + std::to_string(status_code) + "\"}";
+    }
+
+    // 6. Read the response
+    std::string result = http->ReadAll();
+    http->Close();
+
+    return result;
+}
+
+std::string SendBasicPostRequest(const std::string& post_data) {
+
+
+
+    auto network = Board::GetInstance().GetNetwork();
+    auto http = network->CreateHttp(3);
+
+
+    const std::string url = "http://192.168.236.18:1112/api/states/xiaozhi";
+
+    // 2. Set headers
+    // For a simple string, we set Content-Type.
+    // We assume the http->Write() method or the underlying client
+    // will handle the Content-Length header.
+    http->SetHeader("Content-Type", "text/plain; charset=utf-8"); // Or "text/plain"
+
+    // 3. Open the connection
+    if (!http->Open("POST", url)) {
+        // ESP_LOGE(TAG, "Failed to connect to %s", url.c_str());
+        return "{\"success\": false, \"message\": \"Failed to connect to URL\"}";
+    }
+
+    // 4. Write the POST body
+    // Unlike the chunked example, we write the entire string at once.
+    int bytes_written = http->Write(post_data.c_str(), post_data.size());
+    http->Write("", 0);
+    if (bytes_written != post_data.size()) {
+        // ESP_LOGE(TAG, "Failed to write all data. Wrote %d of %d bytes.", bytes_written, (int)post_data.size());
+        http->Close();
+        return "{\"success\": false, \"message\": \"Failed to write POST body\"}";
+    }
+
+    // 5. Check the response status
+    int status_code = http->GetStatusCode();
+    if (status_code != 200) {
+        // ESP_LOGE(TAG, "Request failed, status code: %d", status_code);
+        http->Close();
+        return "{\"success\": false, \"message\": \"Request failed with status " + std::to_string(status_code) + "\"}";
+    }
+
+    // 6. Read the response
+    std::string result = http->ReadAll();
+    http->Close();
+
+    // ESP_LOGI(TAG, "Successfully sent POST to %s. Response: %s", url.c_str(), result.c_str());
+    return result;
+}
+
+std::string SendBulbStatus(bool turn_on) {
+    auto network = Board::GetInstance().GetNetwork();
+    // Using channel 4 to distinguish from AC (2) and Basic (3) requests
+    auto http = network->CreateHttp(4);
+
+    // TODO: Update this URL to match your specific light entity ID in Home Assistant
+    const std::string url = "http://123.60.38.166:8123/api/states/light.living_room_bulb";
+
+    // 1. Set headers
+    http->SetHeader("Content-Type", "application/json; charset=utf-8");
+    // Using the same token as AC control
+    http->SetHeader("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhNzA4MzU1MWIxZGM0ODUzYmNmYjhiM2U3Y2NhMjM1OSIsImlhdCI6MTc2MzYyNzg2OCwiZXhwIjoyMDc4OTg3ODY4fQ.DOE7UIE6MBDNDPLVMUYx0nR8R0eVtDfbeMWRl_OoAyM");
+
+    // 2. Determine state string
+    std::string state_str = turn_on ? "light_on" : "light_off";
+
+    // 3. Construct the JSON Body
+    std::string json_payload = "{"
+        "\"state\": \"" + state_str + "\","
+        "\"attributes\": {"
+            "\"friendly_name\": \"Living Room Bulb\","
+            "\"icon\": \"mdi:lightbulb\""
+        "}"
+    "}";
+
+    // 4. Open the connection
+    if (!http->Open("POST", url)) {
+        return "{\"success\": false, \"message\": \"Failed to connect to URL\"}";
+    }
+
+    // 5. Write the POST body
+    int bytes_written = http->Write(json_payload.c_str(), json_payload.size());
+    http->Write("", 0);
+
+    if (bytes_written != json_payload.size()) {
+        http->Close();
+        return "{\"success\": false, \"message\": \"Failed to write POST body\"}";
+    }
+
+    // 6. Check the response status
+    int status_code = http->GetStatusCode();
+
+    if (status_code != 200 && status_code != 201) {
+        http->Close();
+        return "{\"success\": false, \"message\": \"Request failed with status " + std::to_string(status_code) + "\"}";
+    }
+
+    // 7. Read the response
+    std::string result = http->ReadAll();
+    http->Close();
+
+    return result;
+}
+
+void ParseCommand(const std::string& input) {
+    int temperature = 0;   // Default safe value
+    std::string mode = "";
+    std::string fan = "";
+
+    ESP_LOGI(TAG, "Parsing AC Command: %s", input.c_str());
+
+    // --- 1. Parse Temperature (Integer) ---
+    std::string temp_key = "\"温度\"";
+    size_t key_pos = input.find(temp_key);
+    
+    if (key_pos != std::string::npos) {
+        // Find colon after key
+        size_t colon_pos = input.find(':', key_pos);
+        if (colon_pos != std::string::npos) {
+            // Start looking for digits after the colon
+            size_t val_start = colon_pos + 1;
+            
+            // Skip whitespace
+            while (val_start < input.length() && 
+                  (input[val_start] == ' ' || input[val_start] == '\t' || input[val_start] == '\n' || input[val_start] == '\r')) {
+                val_start++;
+            }
+
+            // Parse the number
+            if (val_start < input.length() && isdigit(input[val_start])) {
+                temperature = atoi(&input.c_str()[val_start]);
+            }
+        }
+    }
+
+    // --- Helper Lambda for String Extraction ---
+    auto extract_string_val = [&](const std::string& key) -> std::string {
+        size_t k_pos = input.find(key);
+        if (k_pos == std::string::npos) return "";
+
+        size_t c_pos = input.find(':', k_pos);
+        if (c_pos == std::string::npos) return "";
+
+        // Find opening quote
+        size_t start_quote = input.find('"', c_pos);
+        if (start_quote == std::string::npos) return "";
+
+        // Find closing quote (this naturally ignores text like (从... 选择一项) that comes after)
+        size_t end_quote = input.find('"', start_quote + 1);
+        if (end_quote == std::string::npos) return "";
+
+        return input.substr(start_quote + 1, end_quote - start_quote - 1);
+    };
+
+    // --- 2. Parse Mode (String) ---
+    std::string mode_raw = extract_string_val("\"模式\"");
+    
+    // Optional: Map Chinese raw values to English for Home Assistant if needed
+    if (mode_raw == "制冷") mode = "cool";
+    else if (mode_raw == "制热") mode = "heat";
+    else if (mode_raw == "送风") mode = "fan_only";
+    else if (mode_raw == "关闭") mode = "AC_off";
+    else mode = mode_raw; // Fallback to raw if no mapping found
+
+    // --- 3. Parse Fan Speed (String) ---
+    std::string fan_raw = extract_string_val("\"风速\"");
+    
+    // Optional: Map Chinese raw values to English
+    if (fan_raw == "低") fan = "low";
+    else if (fan_raw == "中") fan = "medium";
+    else if (fan_raw == "高") fan = "high";
+    else fan = fan_raw;
+
+
+    // --- 4. Parse bulb status (String) ---
+    std::string mode_bulb = extract_string_val("\"灯光\"");
+    if (mode_bulb == "开启") {
+        bulbmode = true;
+    } else if (mode_bulb == "关闭") {
+        bulbmode = false;
+    }
+
+    ESP_LOGI(TAG, "Parsed Result -> Temp: %d, Mode: %s, Fan: %s, Bulb: %s", temperature, mode.c_str(), fan.c_str(), mode_bulb.c_str());
+
+    // --- 4. Execute Command ---
+    // Only send if we actually found valid data
+    if (temperature!=0) temp = temperature;
+    if (!mode.empty()) acmode = mode;
+    if (!fan.empty()) fan_level = fan;
 }
 
 void Application::CheckAssetsVersion() {
@@ -420,6 +682,7 @@ void Application::Start() {
         xEventGroupSetBits(event_group_, MAIN_EVENT_ERROR);
     });
     protocol_->OnIncomingAudio([this](std::unique_ptr<AudioStreamPacket> packet) {
+        ESP_LOGI(TAG, "Receive incoming audio packet");
         if (device_state_ == kDeviceStateSpeaking) {
             audio_service_.PushPacketToDecodeQueue(std::move(packet));
         }
@@ -466,7 +729,16 @@ void Application::Start() {
                 if (cJSON_IsString(text)) {
                     ESP_LOGI(TAG, "<< %s", text->valuestring);
                     Schedule([this, display, message = std::string(text->valuestring)]() {
-                        display->SetChatMessage("assistant", message.c_str());
+                        display->SetChatMessage("assistant",  message.c_str());
+                        if ((message.find("模式") != std::string::npos) || (message.find("风速") != std::string::npos) || (message.find("温度") != std::string::npos) || (message.find("灯光") != std::string::npos)) {
+                            ParseCommand(message);
+                        }
+                        if (message.find("风速") != std::string::npos) {
+                            SendACStatus(temp, fan_level, acmode);
+                        }
+                        if (message.find("灯光") != std::string::npos) {
+                            SendBulbStatus(bulbmode);
+                        }
                     });
                 }
             }
