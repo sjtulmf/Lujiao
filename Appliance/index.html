@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能家居控制系统</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-home"></i> 智能家居控制系统</h1>
+            <div class="status-bar">
+                <span id="connection-status" class="status-badge">
+                    <i class="fas fa-circle"></i> 连接中...
+                </span>
+                <span id="last-update"></span>
+            </div>
+        </header>
+
+        <main>
+            <!-- 空调控制面板 -->
+            <section class="device-section">
+                <h2><i class="fas fa-snowflake"></i> 空调控制</h2>
+                <div class="device-card air-conditioner" id="air_conditioner">
+                    <div class="device-header">
+                        <div class="device-info">
+                            <h3>客厅空调</h3>
+                            <span class="device-status" id="ac-status">关闭</span>
+                        </div>
+                        <div class="power-indicator" id="ac-power-indicator">
+                            <i class="fas fa-power-off"></i>
+                        </div>
+                    </div>
+
+                    <div class="device-controls" id="ac-controls">
+                        <!-- 温度显示 -->
+                        <div class="control-group">
+                            <div class="temperature-display">
+                                <div class="temp-value">
+                                    <span id="ac-temp">26</span>
+                                    <span class="temp-unit">°C</span>
+                                </div>
+                                <div class="temp-label">当前设定温度</div>
+                            </div>
+                        </div>
+
+                        <!-- 模式显示 -->
+                        <div class="control-group">
+                            <label class="control-label">
+                                <i class="fas fa-cog"></i> 运行模式
+                            </label>
+                            <div class="mode-buttons">
+                                <div class="mode-btn" data-mode="cool">
+                                    <i class="fas fa-snowflake"></i> 制冷
+                                </div>
+                                <div class="mode-btn" data-mode="heat">
+                                    <i class="fas fa-fire"></i> 制热
+                                </div>
+                                <div class="mode-btn" data-mode="fan">
+                                    <i class="fas fa-fan"></i> 送风
+                                </div>
+                                <div class="mode-btn" data-mode="off">
+                                    <i class="fas fa-stop-circle"></i> 停止
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 风速显示 -->
+                        <div class="control-group">
+                            <label class="control-label">
+                                <i class="fas fa-wind"></i> 风速
+                            </label>
+                            <div class="fan-speed-buttons">
+                                <div class="fan-btn" data-speed="low">
+                                    低速
+                                </div>
+                                <div class="fan-btn" data-speed="medium">
+                                    中速
+                                </div>
+                                <div class="fan-btn" data-speed="high">
+                                    高速
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 灯光控制面板 -->
+            <section class="device-section">
+                <h2><i class="fas fa-lightbulb"></i> 灯光控制</h2>
+                
+                <!-- 客厅灯 -->
+                <div class="device-card light" id="light_living">
+                    <div class="device-header">
+                        <div class="device-info">
+                            <h3>客厅灯</h3>
+                            <span class="device-status" id="light-living-status">关闭</span>
+                        </div>
+                        <div class="power-indicator" id="light-living-power-indicator">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- 灯光状态指示条 -->
+                    <div class="light-status-indicator" id="light-living-indicator">
+                        <div class="status-bar-inner" id="light-living-bar"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 同步按钮 -->
+        <div class="sync-button-container">
+            <button class="sync-button" onclick="requestSync()">
+                <i class="fas fa-sync-alt"></i> 刷新数据
+            </button>
+        </div>
+
+        <!-- 通知提示 -->
+        <div id="notification" class="notification"></div>
+    </div>
+
+    <!-- Socket.IO 客户端库 -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <!-- 应用脚本 -->
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

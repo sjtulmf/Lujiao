@@ -1,0 +1,622 @@
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2ecc71;
+    --danger-color: #e74c3c;
+    --warning-color: #f39c12;
+    --dark-bg: #1a1a2e;
+    --card-bg: #16213e;
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0a0;
+    --border-color: #2d3561;
+    --success-color: #27ae60;
+    --cool-color: #3498db;
+    --cool-600: #2e86de; /* 深蓝 - 制冷主色 */
+    --cool-400: #5dade2; /* 浅蓝 - 制冷强调 */
+    --heat-color: #e74c3c;
+    --heat-700: #c0392b; /* 深红 - 制热主色 */
+    --heat-400: #ec7063; /* 浅红 - 制热强调 */
+
+    /* 空调模式颜色 */
+    --ac-cool-color: var(--cool-color);
+    --ac-heat-color: var(--heat-color);
+    --ac-fan-color: #16a085; /* 青绿色 - 送风 */
+    --ac-off-color: #7f8c8d; /* 中性灰 - 停止 */
+
+    /* 风速强度颜色（通过亮度/饱和度区分） */
+    --fan-low-color: rgba(46,204,113,0.25);
+    --fan-medium-color: rgba(46,204,113,0.45);
+    --fan-high-color: rgba(46,204,113,0.75);
+
+    /* 灯光颜色 */
+    --light-on-color: #f1c40f; /* 明亮黄 */
+    --light-on-glow: rgba(241,196,15,0.35);
+    --light-off-color: #7f8c8d; /* 暗灰 */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header */
+header {
+    text-align: center;
+    padding: 30px 0;
+    margin-bottom: 30px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+header h1 {
+    font-size: 2.2em;
+    margin-bottom: 15px;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.status-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--card-bg);
+    border-radius: 20px;
+    font-size: 0.9em;
+}
+
+.status-badge i {
+    color: var(--success-color);
+    animation: pulse 2s infinite;
+}
+
+.read-only-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(241, 196, 15, 0.2);
+    border: 1px solid var(--warning-color);
+    border-radius: 20px;
+    font-size: 0.85em;
+    color: var(--warning-color);
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Device Sections */
+.device-section {
+    margin-bottom: 30px;
+}
+
+.device-section h2 {
+    font-size: 1.5em;
+    margin-bottom: 15px;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Device Cards */
+.device-card {
+    background: var(--card-bg);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.device-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(52, 152, 219, 0.2);
+}
+
+.device-card.active {
+    border-color: var(--primary-color);
+    box-shadow: 0 5px 20px rgba(52, 152, 219, 0.3);
+}
+
+.device-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.device-info h3 {
+    font-size: 1.3em;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.readonly-tag {
+    font-size: 0.6em;
+    color: var(--warning-color);
+    font-weight: normal;
+}
+
+.device-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-weight: 600;
+    background: var(--danger-color);
+}
+
+.device-status.on {
+    background: var(--success-color);
+}
+
+/* Power Indicator */
+.power-indicator {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--dark-bg);
+    border: 2px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3em;
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+}
+
+.power-indicator.on {
+    background: var(--success-color);
+    border-color: var(--success-color);
+    color: white;
+    box-shadow: 0 0 20px rgba(39, 174, 96, 0.5);
+}
+
+/* Device Controls */
+.device-controls {
+    display: none;
+    animation: slideDown 0.3s ease;
+}
+
+.device-controls.active {
+    display: block;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.control-group {
+    margin-bottom: 20px;
+}
+
+.control-label {
+    display: block;
+    margin-bottom: 12px;
+    font-weight: 600;
+    font-size: 1em;
+    color: var(--text-secondary);
+}
+
+.control-label i {
+    margin-right: 8px;
+    color: var(--primary-color);
+}
+
+/* Temperature Display */
+.temperature-display {
+    text-align: center;
+    padding: 25px;
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.1) 0%, rgba(46, 204, 113, 0.1) 100%);
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.temp-value {
+    font-size: 4em;
+    font-weight: bold;
+    background: linear-gradient(45deg, var(--cool-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.temp-unit {
+    font-size: 0.5em;
+}
+
+.temp-label {
+    color: var(--text-secondary);
+    margin-top: 10px;
+    font-size: 0.9em;
+}
+
+/* Mode Buttons (只读显示) */
+.mode-buttons, .fan-speed-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 10px;
+}
+
+.mode-btn, .fan-btn {
+    padding: 12px 15px;
+    border: 2px solid var(--border-color);
+    background: var(--dark-bg);
+    color: var(--text-secondary);
+    border-radius: 10px;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: default;
+}
+
+.mode-btn i {
+    font-size: 1.3em;
+}
+
+.mode-btn.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+}
+
+.mode-btn[data-mode="cool"].active {
+    background: var(--ac-cool-color);
+    border-color: var(--ac-cool-color);
+}
+
+.mode-btn[data-mode="heat"].active {
+    background: var(--ac-heat-color);
+    border-color: var(--ac-heat-color);
+}
+
+.mode-btn[data-mode="fan"].active {
+    background: var(--ac-fan-color);
+    border-color: var(--ac-fan-color);
+}
+
+.mode-btn[data-mode="off"].active {
+    background: var(--ac-off-color);
+    border-color: var(--ac-off-color);
+}
+
+/* 风速按钮：三个等亮，选中时高亮绿色 */
+.fan-btn[data-speed="low"],
+.fan-btn[data-speed="medium"],
+.fan-btn[data-speed="high"] {
+    background: var(--dark-bg);
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+}
+
+/* 风速按钮被选中时高亮 */
+.fan-btn[data-speed="low"].active,
+.fan-btn[data-speed="medium"].active,
+.fan-btn[data-speed="high"].active {
+    background: var(--secondary-color);
+    border-color: var(--secondary-color);
+    color: white;
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+}
+
+/* 灯光开/关视觉 */
+.light-status-indicator .status-bar-inner.on {
+    background: linear-gradient(90deg, var(--light-on-color), #ffd65a);
+    box-shadow: 0 0 18px var(--light-on-glow);
+    width: 100%;
+}
+.light-status-indicator .status-bar-inner.off {
+    background: linear-gradient(90deg, var(--light-off-color), rgba(127,140,141,0.6));
+    width: 0%;
+}
+
+/* 更明显的空调模式色块（可在 card 上添加 mode-* 类） */
+.device-card.air-conditioner.mode-cool {
+    border-color: var(--cool-600);
+}
+.device-card.air-conditioner.mode-heat {
+    border-color: var(--heat-700);
+}
+.device-card.air-conditioner.mode-fan {
+    border-color: var(--ac-fan-color);
+}
+.device-card.air-conditioner.mode-off {
+    border-color: var(--ac-off-color);
+}
+
+/* Light Status Indicator */
+.light-status-indicator {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 15px;
+}
+
+.light-status-indicator.on {
+    box-shadow: 0 0 15px rgba(241, 196, 15, 0.3);
+}
+
+.status-bar-inner {
+    height: 100%;
+    border-radius: 4px;
+    transition: all 0.5s ease;
+    width: 0%;
+}
+
+/* Light card glow effect */
+.device-card.light.active {
+    position: relative;
+}
+
+.device-card.light.active::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, 
+        rgba(241, 196, 15, 0.1),
+        rgba(241, 196, 15, 0.3),
+        rgba(241, 196, 15, 0.1));
+    border-radius: 17px;
+    z-index: -1;
+    opacity: 0.6;
+    animation: lightGlow 3s ease-in-out infinite;
+}
+
+@keyframes lightGlow {
+    0%, 100% {
+        opacity: 0.4;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.01);
+    }
+}
+
+/* 空调模式颜色主题 */
+.device-card.air-conditioner.active.mode-cool {
+    border-color: var(--ac-cool-color);
+    box-shadow: 0 5px 25px rgba(52, 152, 219, 0.4);
+}
+
+.device-card.air-conditioner.active.mode-cool .temperature-display {
+    background: linear-gradient(135deg, 
+        rgba(52, 152, 219, 0.2) 0%, 
+        rgba(52, 152, 219, 0.1) 100%);
+}
+
+.device-card.air-conditioner.active.mode-cool .temp-value {
+    background: linear-gradient(45deg, #3498db, #5dade2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.device-card.air-conditioner.active.mode-heat {
+    border-color: var(--ac-heat-color);
+    box-shadow: 0 5px 25px rgba(231, 76, 60, 0.4);
+}
+
+.device-card.air-conditioner.active.mode-heat .temperature-display {
+    background: linear-gradient(135deg, 
+        rgba(231, 76, 60, 0.2) 0%, 
+        rgba(231, 76, 60, 0.1) 100%);
+}
+
+.device-card.air-conditioner.active.mode-heat .temp-value {
+    background: linear-gradient(45deg, #e74c3c, #ec7063);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.device-card.air-conditioner.active.mode-fan {
+    border-color: var(--ac-fan-color);
+    box-shadow: 0 5px 25px rgba(46, 204, 113, 0.4);
+}
+
+.device-card.air-conditioner.active.mode-fan .temperature-display {
+    background: linear-gradient(135deg, 
+        rgba(46, 204, 113, 0.2) 0%, 
+        rgba(46, 204, 113, 0.1) 100%);
+}
+
+.device-card.air-conditioner.active.mode-fan .temp-value {
+    background: linear-gradient(45deg, #2ecc71, #58d68d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Sync Button */
+.sync-button-container {
+    text-align: center;
+    margin: 30px 0;
+}
+
+.sync-button {
+    padding: 15px 40px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border: none;
+    border-radius: 25px;
+    color: white;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sync-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+}
+
+.sync-button:active {
+    transform: translateY(0);
+}
+
+.sync-button i {
+    transition: transform 0.3s ease;
+}
+
+.sync-button:hover i {
+    transform: rotate(180deg);
+}
+
+/* Notification */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    background: var(--card-bg);
+    border: 2px solid var(--success-color);
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    display: none;
+    animation: slideIn 0.3s ease;
+    z-index: 1000;
+    max-width: 350px;
+}
+
+.notification.show {
+    display: block;
+}
+
+.notification.error {
+    border-color: var(--danger-color);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
+    header h1 {
+        font-size: 1.6em;
+    }
+
+    .device-card {
+        padding: 15px;
+    }
+
+    .temp-value {
+        font-size: 3em;
+    }
+
+    .mode-buttons, .fan-speed-buttons {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .status-bar {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+/* Loading State */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    border: 3px solid var(--border-color);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* 更新高亮动画：快速突出更新的卡片 */
+.highlight {
+    animation: highlightPulse 1.0s ease-in-out;
+}
+
+@keyframes highlightPulse {
+    0% { box-shadow: 0 0 0 rgba(255,255,255,0); transform: translateY(0); }
+    10% { box-shadow: 0 0 10px rgba(255,255,255,0.08); transform: translateY(-2px); }
+    50% { box-shadow: 0 0 30px rgba(255,255,255,0.12); }
+    100% { box-shadow: 0 0 0 rgba(255,255,255,0); transform: translateY(0); }
+}
+
+/* power-indicator 的脉冲效果（临时） */
+.power-indicator.pulse {
+    animation: powerPulse 1.2s ease-in-out;
+    box-shadow: 0 0 20px rgba(39,174,96,0.25);
+}
+
+@keyframes powerPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
