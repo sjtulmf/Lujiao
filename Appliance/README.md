@@ -1,1 +1,104 @@
-## 模拟受控家电端代码
+# 🏠 智能家居控制系统 (Smart Home Control System)
+
+一个基于 Flask + WebSocket 的智能家居控制面板，实时同步 Home Assistant 设备状态。
+
+## 📁 项目结构
+
+```
+Appliance/
+├── backend/                    # 后端代码
+│   ├── app.py                  # Flask 主程序
+│   └── requirements.txt        # Python 依赖
+├── frontend/                   # 前端代码
+│   ├── templates/
+│   │   └── index.html          # 主页面
+│   └── static/
+│       ├── css/
+│       │   └── style.css       # 样式文件
+│       └── js/
+│           └── app.js          # 前端逻辑
+└── README.md                   # 项目说明
+```
+
+## ✨ 功能特性
+
+- 🌡️ **空调控制面板** - 实时显示温度、模式（制冷/制热/送风）、风速
+- 💡 **灯光控制面板** - 实时显示开关状态
+- 🔄 **WebSocket 实时同步** - 设备状态变化即时推送
+- 📱 **响应式设计** - 支持桌面和移动端
+- 🎨 **现代 UI** - 暗色主题，流畅动画
+
+## 🚀 快速开始
+
+### 1. 安装依赖
+
+```bash
+cd backend
+pip install -r requirements.txt
+```
+
+### 2. 配置 Home Assistant
+
+修改 `backend/app.py` 中的配置：
+
+```python
+HOME_ASSISTANT_URL = "http://your-ha-ip:8123"
+HOME_ASSISTANT_TOKEN = "your-long-lived-access-token"
+```
+
+### 3. 启动服务
+
+```bash
+cd backend
+python app.py
+```
+
+### 4. 访问页面
+
+打开浏览器访问：`http://localhost:5000`
+
+## 🛠️ 技术栈
+
+### 后端
+- **Flask** - Web 框架
+- **Flask-SocketIO** - WebSocket 支持
+- **Flask-CORS** - 跨域支持
+- **Requests** - HTTP 请求
+
+### 前端
+- **HTML5 / CSS3** - 页面结构和样式
+- **JavaScript (ES6+)** - 前端逻辑
+- **Socket.IO Client** - WebSocket 客户端
+- **Font Awesome** - 图标库
+
+## 📡 API 接口
+
+| 方法 | 路径 | 描述 |
+|------|------|------|
+| GET | `/` | 主页面 |
+| GET | `/api/devices` | 获取所有设备状态 |
+| GET | `/api/device/<id>` | 获取单个设备状态 |
+| POST | `/api/sync` | 手动触发同步 |
+
+## 🔌 WebSocket 事件
+
+| 事件 | 方向 | 描述 |
+|------|------|------|
+| `connect` | 客户端→服务端 | 建立连接 |
+| `initial_state` | 服务端→客户端 | 初始设备状态 |
+| `device_update` | 服务端→客户端 | 设备状态更新 |
+| `request_sync` | 客户端→服务端 | 请求同步 |
+
+## ⌨️ 快捷键
+
+- `Alt + S` - 手动刷新数据
+
+## 📝 注意事项
+
+- 当前为**只读模式**，仅从 Home Assistant 读取状态
+- 后台每 1 秒自动同步一次设备状态
+- 需要有效的 Home Assistant 长期访问令牌
+
+## 📄 License
+
+MIT License
